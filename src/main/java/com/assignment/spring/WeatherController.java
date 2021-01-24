@@ -1,37 +1,32 @@
 package com.assignment.spring;
 
-import com.assignment.spring.api.WeatherResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
+@RequestMapping("/weather")
 public class WeatherController {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final WeatherClient weatherClient;
+    private final WeatherRepository weatherRepository;
 
     @Autowired
-    private WeatherRepository weatherRepository;
-
-    @RequestMapping("/weather")
-    public WeatherEntity weather(HttpServletRequest request) {
-        String city = request.getParameter("city");
-        String url = Constants.WEATHER_API_URL.replace("{city}", city).replace("{appid}", Constants.APP_ID);
-        ResponseEntity<WeatherResponse> response = restTemplate.getForEntity(url, WeatherResponse.class);
-        return mapper(response.getBody());
+    public WeatherController(WeatherClient weatherClient, WeatherRepository weatherRepository) {
+        this.weatherClient = weatherClient;
+        this.weatherRepository = weatherRepository;
     }
 
-    private WeatherEntity mapper(WeatherResponse response) {
-        WeatherEntity entity = new WeatherEntity();
-        entity.setCity(response.getName());
-        entity.setCountry(response.getSys().getCountry());
-        entity.setTemperature(response.getMain().getTemp());
-
-        return weatherRepository.save(entity);
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<WeatherEntity> getWeather(@RequestParam String city) {
+        return weatherClient.getWeather(city)
+            .map(weatherRepository::save)
+            .map(weatherEntity -> new ResponseEntity(weatherEntity, HttpStatus.OK))
+            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
 }
