@@ -14,37 +14,37 @@ public class WeatherEntity {
 
     private String country;
 
+    @Column(columnDefinition = "NUMERIC (5, 2)")
     private Double temperature;
 
     public Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public String getCity() {
         return city;
     }
 
-    public void setCity(String city) {
+    public WeatherEntity setCity(String city) {
         this.city = city;
+        return this;
     }
 
     public String getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public WeatherEntity setCountry(String country) {
         this.country = country;
+        return this;
     }
 
     public Double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(Double temperature) {
+    public WeatherEntity setTemperature(Double temperature) {
         this.temperature = temperature;
+        return this;
     }
 }

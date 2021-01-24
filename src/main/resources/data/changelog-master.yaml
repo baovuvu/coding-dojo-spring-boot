@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file:  schema.sql
+      relativeToChangelogFile: true
+  - include:
+      file:  hibernate-sequence.yaml
+      relativeToChangelogFile: true
